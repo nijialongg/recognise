@@ -1,0 +1,73 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="ZH-CN">
+
+<head>
+    <title>人脸检测平台</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="../static/js/background.js"></script>
+
+    <script type="text/javascript">
+        function ProcessFile(e) {
+            var file = document.getElementById('file').files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var txt = event.target.result;
+
+                    var img = document.createElement("img");
+                    img.src = txt; //将图片base64字符串赋值给img的src
+                    document.getElementById("result").appendChild(img);
+                };
+            }
+            reader.readAsDataURL(file);
+        }
+        function contentLoaded() {
+            document.getElementById('file').addEventListener('change',
+                ProcessFile, false);
+        }
+        window.addEventListener("DOMContentLoaded", contentLoaded, false);
+    </script>
+</head>
+
+<body>
+    请选取一个图像文件: <input type="file" id="file" name="file" />
+    <div id="result"></div>
+
+    <div id="result_new"></div>
+
+    <img id="ewmtp" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Red dot" />
+
+
+<div>
+    <button type="button" class="btn btn-primary btn-lg" id="lgbut_compute">提交</button>
+</div>
+
+    <script>
+        function ShowResult(data) {
+            var v = data['img64'];
+            var img = document.createElement("img_new");
+            img.src = "data:image/jpeg;base64, " + v;
+            document.getElementById("result_new").appendChild(img);
+            ewmtp.src = "data:image/jpeg;base64, " + v;
+        }
+    </script>
+    <script>
+        $('#lgbut_compute').click(function () {
+            formdata = new FormData();
+            var file = $("#file")[0].files[0];
+            formdata.append("image", file);
+            $.ajax({
+                url: '/facedetectDemo/', //调用django服务器计算函数
+                type: 'POST', //请求类型
+                data: formdata,
+                dataType: 'json', //期望获得的响应类型为json
+                processData: false,
+                contentType: false,
+                success: ShowResult //在请求成功之后调用该回调函数输出结果
+            })
+        })
+    </script>
+</body>
+</html>
